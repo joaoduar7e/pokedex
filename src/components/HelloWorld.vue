@@ -1,58 +1,99 @@
 <template>
-  <div class="hello">
-    <h1>{{ msg }}</h1>
-    <p>
-      For a guide and recipes on how to configure / customize this project,<br>
-      check out the
-      <a href="https://cli.vuejs.org" target="_blank" rel="noopener">vue-cli documentation</a>.
-    </p>
-    <h3>Installed CLI Plugins</h3>
-    <ul>
-      <li><a href="https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-plugin-babel" target="_blank" rel="noopener">babel</a></li>
-      <li><a href="https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-plugin-eslint" target="_blank" rel="noopener">eslint</a></li>
-    </ul>
-    <h3>Essential Links</h3>
-    <ul>
-      <li><a href="https://vuejs.org" target="_blank" rel="noopener">Core Docs</a></li>
-      <li><a href="https://forum.vuejs.org" target="_blank" rel="noopener">Forum</a></li>
-      <li><a href="https://chat.vuejs.org" target="_blank" rel="noopener">Community Chat</a></li>
-      <li><a href="https://twitter.com/vuejs" target="_blank" rel="noopener">Twitter</a></li>
-      <li><a href="https://news.vuejs.org" target="_blank" rel="noopener">News</a></li>
-    </ul>
-    <h3>Ecosystem</h3>
-    <ul>
-      <li><a href="https://router.vuejs.org" target="_blank" rel="noopener">vue-router</a></li>
-      <li><a href="https://vuex.vuejs.org" target="_blank" rel="noopener">vuex</a></li>
-      <li><a href="https://github.com/vuejs/vue-devtools#vue-devtools" target="_blank" rel="noopener">vue-devtools</a></li>
-      <li><a href="https://vue-loader.vuejs.org" target="_blank" rel="noopener">vue-loader</a></li>
-      <li><a href="https://github.com/vuejs/awesome-vue" target="_blank" rel="noopener">awesome-vue</a></li>
-    </ul>
+  <div class="user">
+    <BaseMenu />
+
+    <section class="infos">
+      <div id="card" class="card">
+        <v-col cols="3" v-for="pokemon in pokemons" :key="pokemon.name">
+          <div id="poke" class="poke">
+            <p>{{ pokemon.name | upperCase }}</p>
+            <img
+              :src="`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${get_id(
+                pokemon
+              )}.png`"
+              :alt="pokemon.name"
+              width="100%"
+            />
+
+            <p>{{ pokemon.types }}</p>
+          </div>
+        </v-col>
+      </div>
+    </section>
+
+    <BaseFooter />
   </div>
 </template>
 
+
 <script>
+import api from "../service/api";
+import BaseMenu from "@/components/BaseMenu.vue";
+import BaseFooter from "@/components/BaseFooter.vue";
+
 export default {
-  name: 'HelloWorld',
-  props: {
-    msg: String
-  }
-}
+  name: "PokemonU",
+  components: {
+    BaseMenu,
+    BaseFooter,
+  },
+  data() {
+    return {
+      pokemons: [],
+    };
+  },
+  created() {
+    this.getPokemon();
+  },
+  methods: {
+    getPokemon() {
+      api
+        .get("pokemon?limit=151")
+        .then((res) => {
+          this.pokemons = res.data.results;
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    },
+
+    get_id(pokemon) {
+      return pokemon.url.split("/")[6];
+    },
+  },
+  filters: {
+    upperCase: function (value) {
+      var newName = value[0].toUpperCase() + value.slice(1);
+      return newName;
+    },
+  },
+};
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-h3 {
-  margin: 40px 0 0;
+.infos {
+  display: grid;
+  max-width: 650px;
+  margin: 0 auto;
 }
-ul {
-  list-style-type: none;
-  padding: 0;
+
+.infos > .card {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-gap: 10px;
+  align-items: center;
+  grid-column: auto;
+  grid-row: auto;
+  border: none;
 }
-li {
-  display: inline-block;
-  margin: 0 10px;
+
+.poke:hover {
+  transform: scale(1.1);
+  transition: all 0.5s;
 }
-a {
-  color: #42b983;
+
+.poke {
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+  transition: 0.3s;
 }
 </style>
