@@ -17,7 +17,7 @@ Utilizando VueJs para consumir API.
 ## Incial
 
 <p align="center">
-    <img src="src/assets/Pokédex-initial.png">
+    <img src="src/assets/pokedex-initial.png">
 </p>
 
 
